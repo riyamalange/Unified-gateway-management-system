@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - UNIPAY</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <a href="index.html" class="brand">
+      <div class="brand-icon">U</div>
+      <div class="brand-text">UNIPAY</div>
+      <span class="brand-badge">Admin Console</span>
+    </a>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <span id="adminConnectionBadge" class="source-pill source-pill-live">
+        ● Connected (:8080)
+      </span>
+      <div class="nav-links">
+        <span style="font-size: 0.85rem; color: var(--gray-600);" id="adminUserEmailDisplay">admin@gmail.com</span>
+        <button onclick="handleLogout()" class="btn btn-outline btn-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard Container with Sidebar -->
+  <div class="dashboard-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-profile">
+        <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--gray-400); letter-spacing: 0.5px;">Super Administrator</div>
+        <div style="font-size: 1.1rem; font-weight: 800; color: var(--gray-900); margin-top: 2px;">UNIPAY Admin</div>
+        <div style="font-size: 0.75rem; color: var(--gray-500); font-family: monospace;">admin@unipay.com</div>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <button class="sidebar-btn active" data-section="overview" onclick="switchSection('overview')">
+            <span class="sidebar-btn-left"><span class="icon">📊</span> Dashboard</span>
+          </button>
+        </li>
+        <li class="sidebar-item">
+          <button class="sidebar-btn" data-section="merchants" onclick="switchSection('merchants')">
+            <span class="sidebar-btn-left"><span class="icon">🏢</span> Merchants</span>
+            <span id="sidebarMerchantsCount" class="badge badge-gateway" style="font-size: 0.7rem;">0</span>
+          </button>
+        </li>
+        <li class="sidebar-item">
+          <button class="sidebar-btn" data-section="transactions" onclick="switchSection('transactions')">
+            <span class="sidebar-btn-left"><span class="icon">💳</span> Transactions</span>
+            <span id="sidebarTxnsCount" class="badge badge-gateway" style="font-size: 0.7rem;">0</span>
+          </button>
+        </li>
+        <li class="sidebar-item">
+          <button class="sidebar-btn" data-section="gateways" onclick="switchSection('gateways')">
+            <span class="sidebar-btn-left"><span class="icon">🔌</span> Gateways</span>
+            <span class="badge badge-success" style="font-size: 0.7rem;">4</span>
+          </button>
+        </li>
+        <li class="sidebar-item">
+          <button class="sidebar-btn" data-section="refunds" onclick="switchSection('refunds')">
+            <span class="sidebar-btn-left"><span class="icon">↩️</span> Refunds</span>
+            <span id="sidebarRefundsCount" class="badge badge-warning" style="font-size: 0.7rem;">0</span>
+          </button>
+        </li>
+        <li class="sidebar-item">
+          <button class="sidebar-btn" data-section="settlements" onclick="switchSection('settlements')">
+            <span class="sidebar-btn-left"><span class="icon">💰</span> Settlements</span>
+          </button>
+        </li>
+        <li class="sidebar-item" style="margin-top: auto;">
+          <button class="sidebar-btn" onclick="handleLogout()" style="color: var(--danger);">
+            <span class="sidebar-btn-left"><span class="icon">🚪</span> Logout</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div><strong>System Central Control</strong></div>
+        <div style="font-size: 0.72rem; color: var(--gray-400); margin-top: 2px;">
+          Database: <code>unipay</code> | Service: <code>MySQL267</code>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-main">
+
+      <!-- =====================================================================
+           SECTION 1: DASHBOARD OVERVIEW
+      ===================================================================== -->
+      <section id="section-overview" class="dashboard-section active">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">System-Wide Overview</h1>
+            <p class="page-subtitle">Unified monitoring of all merchants, multi-gateway health, and gross payment volume</p>
+          </div>
+          <div>
+            <button onclick="loadAdminData()" class="btn btn-outline btn-sm">↻ Refresh All Data</button>
+          </div>
+        </div>
+
+        <!-- System-Wide KPI Statistics -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-title">Total Merchants</div>
+            <div id="aStatMerchants" class="stat-value">0</div>
+            <div class="stat-desc">Active business tenants</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Connected Gateways</div>
+            <div id="aStatGateways" class="stat-value">4</div>
+            <div class="stat-desc">Razorpay, Stripe, PayPal, PayU</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Total Transactions</div>
+            <div id="aStatTransactions" class="stat-value">0</div>
+            <div class="stat-desc">System-wide audit volume</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Successful Payments</div>
+            <div id="aStatSuccess" class="stat-value" style="color: var(--success);">0</div>
+            <div class="stat-desc">Completed settlements</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Failed Payments</div>
+            <div id="aStatFailed" class="stat-value" style="color: var(--danger);">0</div>
+            <div class="stat-desc">Simulated declinations</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Pending Payments</div>
+            <div id="aStatPending" class="stat-value" style="color: var(--warning);">0</div>
+            <div class="stat-desc">Awaiting clearing</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Total Payment Volume</div>
+            <div id="aStatVolume" class="stat-value" style="color: var(--primary);">₹0</div>
+            <div class="stat-desc">Gross platform volume</div>
+          </div>
+        </div>
+
+        <!-- Recent System Transactions -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Recent System Transactions (All Merchants)</h2>
+            <button class="btn btn-primary btn-sm" onclick="switchSection('transactions')">View All Transactions →</button>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Transaction ID</th>
+                    <th>Merchant</th>
+                    <th>Customer</th>
+                    <th>Order ID</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Gateway Assigned</th>
+                    <th>Status</th>
+                    <th>Date / Time</th>
+                  </tr>
+                </thead>
+                <tbody id="adminRecentTxnsBody">
+                  <tr>
+                    <td colspan="9" style="text-align: center; color: var(--gray-500); padding: 2rem;">Loading transactions...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION 2: MERCHANTS
+      ===================================================================== -->
+      <section id="section-merchants" class="dashboard-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Registered Merchants</h1>
+            <p class="page-subtitle">Businesses integrated with UNIPAY (MySQL <code>merchants</code> table)</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Merchant ID</th>
+                    <th>Merchant Code</th>
+                    <th>Business Name</th>
+                    <th>Billing Email</th>
+                    <th>API Key (Integration Secret)</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminMerchantsBody">
+                  <tr>
+                    <td colspan="7" style="text-align: center; color: var(--gray-500); padding: 2rem;">Loading merchants...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION 3: TRANSACTIONS (GLOBAL MULTI-MERCHANT)
+      ===================================================================== -->
+      <section id="section-transactions" class="dashboard-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Global System Transactions</h1>
+            <p class="page-subtitle">Full system-wide transactional ledger across all merchants</p>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <input type="text" id="adminTxnSearchInput" class="search-input" placeholder="Search by Txn, Order, or Customer..." oninput="filterAdminTransactions()">
+            <select id="adminMerchantFilter" class="filter-select" onchange="filterAdminTransactions()">
+              <option value="ALL">All Merchants</option>
+              <option value="FoodFast">FoodFast</option>
+              <option value="ShopKart">ShopKart</option>
+              <option value="TicketGo">TicketGo</option>
+            </select>
+            <select id="adminMethodFilter" class="filter-select" onchange="filterAdminTransactions()">
+              <option value="ALL">All Payment Methods</option>
+              <option value="UPI">UPI</option>
+              <option value="Card">Card</option>
+              <option value="Net Banking">Net Banking</option>
+              <option value="Wallet">Wallet</option>
+              <option value="PAYPAL">PayPal</option>
+            </select>
+            <select id="adminStatusFilter" class="filter-select" onchange="filterAdminTransactions()">
+              <option value="ALL">All Statuses</option>
+              <option value="SUCCESS">SUCCESS</option>
+              <option value="FAILED">FAILED</option>
+              <option value="PENDING">PENDING</option>
+            </select>
+          </div>
+          <div class="toolbar-right">
+            <span id="adminFilteredCount" style="font-size: 0.85rem; color: var(--gray-500); font-weight: 600;">0 records</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Transaction ID</th>
+                    <th>Merchant</th>
+                    <th>Customer</th>
+                    <th>Order ID</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Gateway Assigned</th>
+                    <th>Status</th>
+                    <th>Date / Time</th>
+                  </tr>
+                </thead>
+                <tbody id="adminTransactionsBody">
+                  <tr>
+                    <td colspan="9" style="text-align: center; color: var(--gray-500); padding: 2rem;">Loading transactions...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION 4: GATEWAYS & ROUTING FAILOVER
+      ===================================================================== -->
+      <section id="section-gateways" class="dashboard-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Gateway Management & Routing Controls</h1>
+            <p class="page-subtitle">Toggle gateways ACTIVE or INACTIVE to test UNIPAY dynamic failover routing</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem; background: var(--primary-light); border-color: var(--primary);">
+          <div class="card-body" style="padding: 1rem 1.25rem;">
+            <strong style="color: var(--primary-dark);">💡 Academic Routing Rule:</strong>
+            <span style="color: var(--gray-700); font-size: 0.88rem; margin-left: 0.4rem;">
+              If a preferred gateway (e.g. Razorpay for UPI) is marked <strong>INACTIVE</strong>, UNIPAY automatically fails over to the next available <strong>ACTIVE</strong> gateway.
+            </span>
+          </div>
+        </div>
+
+        <div id="adminGatewaysGrid" class="gateway-grid">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION 5: REFUNDS
+      ===================================================================== -->
+      <section id="section-refunds" class="dashboard-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Global Refunds Audit</h1>
+            <p class="page-subtitle">Central tracking of all customer reversals and chargebacks (MySQL <code>refunds</code> table)</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Refund ID</th>
+                    <th>Transaction</th>
+                    <th>Merchant</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="adminRefundsBody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; color: var(--gray-500); padding: 2rem;">Loading refunds...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION 6: SETTLEMENTS
+      ===================================================================== -->
+      <section id="section-settlements" class="dashboard-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">System-Wide Settlements Ledger</h1>
+            <p class="page-subtitle">Reconciliation of gross volume, gateway fee deductions, and net payouts across all merchants</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Settlement ID</th>
+                    <th>Merchant</th>
+                    <th>Gateway</th>
+                    <th>Gross Amount</th>
+                    <th>Gateway Fee Deducted</th>
+                    <th>Net Payout</th>
+                    <th>Status</th>
+                    <th>Settlement Date</th>
+                  </tr>
+                </thead>
+                <tbody id="adminSettlementsBody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; color: var(--gray-500); padding: 2rem;">Loading settlements...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>
+    <p>UNIPAY Academic DBMS Project &copy; 2026. Communicates via REST APIs with Spring Boot on port 8080.</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

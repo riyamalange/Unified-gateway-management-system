@@ -1,0 +1,6 @@
+{
+  "name": "UNIPAY - Unified Payment Gateway",
+  "description": "Centralized payment middleware and routing platform connecting merchants to simulated Razorpay, Stripe, PayPal, and PayU gateways with relational DBMS audit tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

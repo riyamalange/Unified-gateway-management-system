@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merchant Dashboard - UNIPAY</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <a href="index.html" class="brand">
+      <div class="brand-icon">U</div>
+      <div class="brand-text">UNIPAY</div>
+      <span class="brand-badge">Merchant Portal</span>
+    </a>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <div style="font-size: 0.85rem; font-weight: 700; color: var(--gray-700); background: var(--gray-100); padding: 4px 10px; border-radius: 6px;">
+        Store: <strong>FoodFast</strong> (MRC-FOODFAST)
+      </div>
+
+      <!-- Live / Mock connection indicator -->
+      <span id="merchantConnectionBadge" class="source-pill source-pill-live">
+        ● Connected (:8080)
+      </span>
+
+      <div class="nav-links">
+        <span style="font-size: 0.85rem; color: var(--gray-600);" id="merchantUserEmailDisplay">merchant@gmail.com</span>
+        <button onclick="handleLogout()" class="btn btn-outline btn-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard Container with Sidebar -->
+  <div class="dashboard-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-profile">
+        <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--gray-400); letter-spacing: 0.5px;">Active Business</div>
+        <div id="sidebarMerchantName" style="font-size: 1.1rem; font-weight: 800; color: var(--gray-900); margin-top: 2px;">FoodFast</div>
+        <div id="sidebarMerchantCode" style="font-size: 0.75rem; color: var(--gray-500); font-family: monospace;">MRC-FOODFAST</div>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <button class="sidebar-btn active" data-section="overview" onclick="switchSection('overview')">
+            <span class="sidebar-btn-left"><span class="icon">📊</span> Dashboard</span>
+          </button>
+        </li>
+        <li class="sidebar-item">
+          <button class="sidebar-btn" data-section="transactions" onclick="switchSection('transactions')">
+            <span class="sidebar-btn-left"><span class="icon">💳</span> Transactions</span>
+            <span id="sidebarTxnCount" class="badge badge-gateway" style="font-size: 0.7rem;">0</span>
+          </button>
+        </li>
+        <li class="sidebar-item">
+          <button class="sidebar-btn" data-section="refunds" onclick="switchSection('refunds')">
+            <span class="sidebar-btn-left"><span class="icon">↩️</span> Refunds</span>
+            <span id="sidebarRefundCount" class="badge badge-warning" style="font-size: 0.7rem;">0</span>
+          </button>
+        </li>
+        <li class="sidebar-item">
+          <button class="sidebar-btn" data-section="settlements" onclick="switchSection('settlements')">
+            <span class="sidebar-btn-left"><span class="icon">💰</span> Settlements</span>
+          </button>
+        </li>
+        <li class="sidebar-item">
+          <button class="sidebar-btn" data-section="gateways" onclick="switchSection('gateways')">
+            <span class="sidebar-btn-left"><span class="icon">🔌</span> Gateways</span>
+          </button>
+        </li>
+        <li class="sidebar-item" style="margin-top: auto;">
+          <button class="sidebar-btn" onclick="handleLogout()" style="color: var(--danger);">
+            <span class="sidebar-btn-left"><span class="icon">🚪</span> Logout</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div><strong>Tenant Data Isolation</strong></div>
+        <div style="font-size: 0.72rem; color: var(--gray-400); margin-top: 2px;">
+          Showing only records WHERE <code>merchant_id = <span id="footerMerchantId">1</span></code>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-main">
+
+      <!-- =====================================================================
+           SECTION 1: DASHBOARD OVERVIEW
+      ===================================================================== -->
+      <section id="section-overview" class="dashboard-section active">
+        <div class="page-header">
+          <div>
+            <h1 id="merchantHeaderTitle" class="page-title">FoodFast Dashboard</h1>
+            <p class="page-subtitle">Isolated transactional overview, real-time volume metrics, and settlement status</p>
+          </div>
+          <div>
+            <button onclick="loadMerchantData()" class="btn btn-outline btn-sm">↻ Refresh Data</button>
+          </div>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-title">Total Transactions</div>
+            <div id="mStatTotalTxns" class="stat-value">0</div>
+            <div class="stat-desc">Lifetime merchant volume</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Successful Payments</div>
+            <div id="mStatSuccessTxns" class="stat-value" style="color: var(--success);">0</div>
+            <div class="stat-desc">Cleared transactions</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Failed Payments</div>
+            <div id="mStatFailedTxns" class="stat-value" style="color: var(--danger);">0</div>
+            <div class="stat-desc">Declined or aborted</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Pending Payments</div>
+            <div id="mStatPendingTxns" class="stat-value" style="color: var(--warning);">0</div>
+            <div class="stat-desc">In progress</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Total Payment Volume</div>
+            <div id="mStatVolume" class="stat-value" style="color: var(--primary);">₹0</div>
+            <div class="stat-desc">Gross processed receivables</div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Transactions</h2>
+            <button class="btn btn-primary btn-sm" onclick="switchSection('transactions')">View All Transactions →</button>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Transaction ID</th>
+                    <th>Order ID</th>
+                    <th>Customer Name</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Gateway Assigned</th>
+                    <th>Status</th>
+                    <th>Date / Time</th>
+                  </tr>
+                </thead>
+                <tbody id="overviewRecentTxnsBody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; color: var(--gray-500); padding: 2rem;">Loading transactions...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION 2: TRANSACTIONS
+      ===================================================================== -->
+      <section id="section-transactions" class="dashboard-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Merchant Transactions</h1>
+            <p class="page-subtitle">Search, filter, and audit all transactions recorded for your store</p>
+          </div>
+          <button onclick="openRefundModal()" class="btn btn-outline btn-sm">↩️ Request Refund</button>
+        </div>
+
+        <!-- Filter and Search Toolbar -->
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <input type="text" id="txnSearchInput" class="search-input" placeholder="Search by Order ID or Txn Code..." oninput="filterTransactions()">
+            <select id="txnMethodFilter" class="filter-select" onchange="filterTransactions()">
+              <option value="ALL">All Payment Methods</option>
+              <option value="UPI">UPI</option>
+              <option value="Card">Card</option>
+              <option value="Net Banking">Net Banking</option>
+              <option value="Wallet">Wallet</option>
+              <option value="PAYPAL">PayPal</option>
+            </select>
+            <select id="txnStatusFilter" class="filter-select" onchange="filterTransactions()">
+              <option value="ALL">All Statuses</option>
+              <option value="SUCCESS">SUCCESS</option>
+              <option value="FAILED">FAILED</option>
+              <option value="PENDING">PENDING</option>
+            </select>
+          </div>
+          <div class="toolbar-right">
+            <span id="filteredTxnCount" style="font-size: 0.85rem; color: var(--gray-500); font-weight: 600;">0 records</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Transaction ID</th>
+                    <th>Order ID</th>
+                    <th>Customer Name</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Gateway Assigned</th>
+                    <th>Status</th>
+                    <th>Date / Time</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="merchantTransactionsBody">
+                  <tr>
+                    <td colspan="9" style="text-align: center; color: var(--gray-500); padding: 2rem;">Loading transactions...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION 3: REFUNDS
+      ===================================================================== -->
+      <section id="section-refunds" class="dashboard-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Refunds & Reversals</h1>
+            <p class="page-subtitle">Track customer payment reversals and initiate new refunds</p>
+          </div>
+          <button onclick="openRefundModal()" class="btn btn-primary btn-sm">➕ Issue New Refund</button>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Refund ID</th>
+                    <th>Transaction Code</th>
+                    <th>Customer Name</th>
+                    <th>Refund Amount</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="merchantRefundsBody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; color: var(--gray-500); padding: 2rem;">No refunds recorded.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION 4: SETTLEMENTS
+      ===================================================================== -->
+      <section id="section-settlements" class="dashboard-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Settlement Payouts</h1>
+            <p class="page-subtitle">Reconciliation of gross payment volume, gateway fee deductions, and net payouts</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Settlement ID</th>
+                    <th>Gateway</th>
+                    <th>Gross Amount</th>
+                    <th>Gateway Fee Deducted</th>
+                    <th>Net Payout</th>
+                    <th>Status</th>
+                    <th>Settlement Date</th>
+                  </tr>
+                </thead>
+                <tbody id="merchantSettlementsBody">
+                  <tr>
+                    <td colspan="7" style="text-align: center; color: var(--gray-500); padding: 2rem;">Loading settlement records...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION 5: GATEWAYS
+      ===================================================================== -->
+      <section id="section-gateways" class="dashboard-section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Connected Payment Gateways</h1>
+            <p class="page-subtitle">UNIPAY centrally manages routing across these gateway adapters for your store</p>
+          </div>
+        </div>
+
+        <div class="gateway-grid" id="merchantGatewaysGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Refund Modal -->
+  <div id="refundModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Issue Customer Refund</h3>
+        <button class="close-btn" onclick="closeRefundModal()">&times;</button>
+      </div>
+      <form id="refundForm" onsubmit="handleRefundSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="refundTxnSelect">Select Successful Transaction</label>
+            <select id="refundTxnSelect" class="form-control" required onchange="onRefundTxnChange()">
+              <!-- Options populated by JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="refundAmount">Refund Amount (INR ₹)</label>
+            <input type="number" id="refundAmount" class="form-control" min="1" step="0.01" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="refundReason">Reason for Refund</label>
+            <input type="text" id="refundReason" class="form-control" placeholder="e.g. Order cancelled by merchant / customer" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeRefundModal()">Cancel</button>
+          <button type="submit" id="refundSubmitBtn" class="btn btn-primary">Process Refund</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>UNIPAY Academic DBMS Project &copy; 2026. Communicates via REST APIs with Spring Boot on port 8080.</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/merchant.js"></script>
+</body>
+</html>

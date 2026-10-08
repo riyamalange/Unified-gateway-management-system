@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UNIPAY – Unified Payment Gateway</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="background-color: #f8fafc;">
+
+  <header class="navbar" style="justify-content: center;">
+    <a href="index.html" class="brand">
+      <div class="brand-icon">U</div>
+      <div class="brand-text">UNIPAY</div>
+    </a>
+  </header>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <h1 class="auth-title">Welcome to UNIPAY</h1>
+        <p class="auth-desc">Unified Payment Gateway Platform</p>
+      </div>
+
+      <div id="alertBox" class="alert"></div>
+
+      <!-- Login Form -->
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input type="email" id="email" class="form-control" placeholder="name@gmail.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.75rem;">
+          LOGIN
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
+        Don't have an account? <a href="signup.html" style="color: var(--primary); font-weight: 700; text-decoration: none;">SIGN UP</a>
+      </div>
+
+      <!-- Quick evaluation buttons for testing demo accounts -->
+      <div class="quick-demo-accounts" style="margin-top: 2rem;">
+        <div class="quick-demo-title">Demo Accounts:</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
+          <button type="button" class="quick-btn" onclick="fillDemoCredentials('rahul@gmail.com', '12345')">Customer (Rahul)</button>
+          <button type="button" class="quick-btn" onclick="fillDemoCredentials('merchant@gmail.com', '123')">Merchant (FoodFast)</button>
+          <button type="button" class="quick-btn" onclick="fillDemoCredentials('admin@gmail.com', '098')">Admin</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>UNIPAY &copy; 2026. Unified Payment Middleware Platform.</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - UNIPAY</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="background-color: #f8fafc;">
+
+  <header class="navbar" style="justify-content: center;">
+    <a href="login.html" class="brand">
+      <div class="brand-icon">U</div>
+      <div class="brand-text">UNIPAY</div>
+    </a>
+  </header>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <h1 class="auth-title">Create UNIPAY Account</h1>
+        <p class="auth-desc">Sign up as a new customer</p>
+      </div>
+
+      <div id="alertBox" class="alert"></div>
+
+      <form onsubmit="handleSignup(event)">
+        <div class="form-group">
+          <label class="form-label" for="name">Full Name</label>
+          <input type="text" id="name" class="form-control" placeholder="Rahul Sharma" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input type="email" id="email" class="form-control" placeholder="rahul@gmail.com" required>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <label class="form-label" for="password" style="margin-bottom: 0;">Password</label>
+            <button type="button" id="suggestPasswordBtn" onclick="suggestPassword()" style="font-size: 0.75rem; color: #2563eb; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 2px 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+              ✨ Suggest Password
+            </button>
+          </div>
+          <input type="password" id="password" class="form-control" placeholder="At least 8 characters recommended" minlength="4" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" class="form-control" placeholder="Re-type password" minlength="4" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.75rem;">
+          CREATE ACCOUNT
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
+        Already registered? <a href="login.html" style="color: var(--primary); font-weight: 700; text-decoration: none;">SIGN IN</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>UNIPAY &copy; 2026. Unified Payment Middleware Platform.</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>

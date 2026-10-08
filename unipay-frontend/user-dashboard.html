@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard - UNIPAY</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="background-color: #f8fafc;">
+
+  <header class="navbar">
+    <a href="user-dashboard.html" class="brand">
+      <div class="brand-icon">U</div>
+      <div class="brand-text">UNIPAY</div>
+    </a>
+    <div class="nav-links">
+      <span style="font-size: 0.9rem; color: var(--gray-700);">
+        Welcome, <strong id="customerNameDisplay">Rahul Sharma</strong>
+      </span>
+      <button onclick="logout()" class="btn btn-outline btn-sm">Logout</button>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 960px;">
+    <!-- Navigation Options -->
+    <div style="display: flex; gap: 0.5rem; margin-top: 1rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.75rem;">
+      <button id="tabPaymentBtn" onclick="switchCustomerTab('payment')" class="btn btn-primary btn-sm">
+        Make a Payment
+      </button>
+      <button id="tabHistoryBtn" onclick="switchCustomerTab('history')" class="btn btn-outline btn-sm">
+        Payment History
+      </button>
+      <button id="tabRefundBtn" onclick="switchCustomerTab('refund')" class="btn btn-outline btn-sm">
+        Request Refund
+      </button>
+    </div>
+
+    <!-- 1. Make a Payment Section -->
+    <div id="sectionPayment" class="card" style="margin-top: 1rem;">
+      <div class="card-header">
+        <h2 class="card-title">Make a Payment</h2>
+      </div>
+      <div class="card-body">
+        <form id="paymentForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="orderId">Order ID</label>
+              <input type="text" id="orderId" class="form-control" value="ORD-DEMO-001" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="amount">Amount (INR ₹)</label>
+              <input type="number" id="amount" class="form-control" value="1000" min="1" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="paymentMethod">Payment Method</label>
+              <select id="paymentMethod" class="form-control" required>
+                <option value="UPI" selected>UPI</option>
+                <option value="Card">Card</option>
+                <option value="Net Banking">Net Banking</option>
+                <option value="Wallet">Wallet</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top: 1rem;">
+            <button type="submit" id="payBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; font-size: 1rem; font-weight: 700;">
+              PAY NOW
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. Customer Request Refund Section -->
+    <div id="sectionRefund" class="card" style="margin-top: 1rem; display: none;">
+      <div class="card-header">
+        <h2 class="card-title">Request Refund</h2>
+      </div>
+      <div class="card-body">
+        <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
+          Request a refund for a successful transaction. The request will be registered as <strong>PENDING</strong> for merchant review.
+        </p>
+
+        <!-- Refund Status Result Box -->
+        <div id="refundResultBox" style="display: none; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+          <div style="font-weight: 800; color: #065f46; font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>✓</span> Refund Request Submitted
+          </div>
+          <div style="font-size: 0.88rem; color: #1e293b; line-height: 1.6;">
+            <div>Transaction: <strong id="refundResultTxnCode" style="font-family: monospace;">TXN-10001</strong></div>
+            <div>Refund Amount: <strong id="refundResultAmount">₹450</strong></div>
+            <div>Status: <span id="refundResultStatus" class="badge badge-warning" style="font-weight: 700;">PENDING</span></div>
+          </div>
+        </div>
+
+        <form id="refundForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="refundTxnCode">Transaction Code</label>
+              <input type="text" id="refundTxnCode" class="form-control" value="TXN-10001" placeholder="e.g. TXN-10001" required style="font-family: monospace;">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="refundAmount">Refund Amount (INR ₹)</label>
+              <input type="number" id="refundAmount" class="form-control" value="450" min="1" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="refundReason">Reason</label>
+              <select id="refundReason" class="form-control" required>
+                <option value="Order cancelled" selected>Order cancelled</option>
+                <option value="Duplicate payment">Duplicate payment</option>
+                <option value="Payment issue">Payment issue</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top: 1rem;">
+            <button type="submit" id="refundBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; font-size: 1rem; font-weight: 700;">
+              REQUEST REFUND
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Customer's Past Refund Requests -->
+      <div class="card-header" style="border-top: 1px solid var(--gray-200); margin-top: 1.5rem;">
+        <h3 class="card-title" style="font-size: 1rem;">Your Submitted Refund Requests</h3>
+        <button onclick="loadUserRefunds()" class="btn btn-outline btn-sm">↻ Refresh</button>
+      </div>
+      <div class="card-body" style="padding: 0;">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Refund ID</th>
+                <th>Transaction Code</th>
+                <th>Refund Amount</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="userRefundsBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--gray-500); padding: 1.5rem;">Loading refunds...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Customer Payment History -->
+    <div id="sectionHistory" class="card" style="margin-top: 1rem;">
+      <div class="card-header">
+        <h2 class="card-title">Payment History</h2>
+        <button onclick="loadUserTransactions()" class="btn btn-outline btn-sm">↻ Refresh</button>
+      </div>
+      <div class="card-body" style="padding: 0;">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Order ID</th>
+                <th>Amount</th>
+                <th>Payment Method</th>
+                <th>Gateway</th>
+                <th>Status</th>
+                <th>Date / Time</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="userTransactionsBody">
+              <tr>
+                <td colspan="8" style="text-align: center; color: var(--gray-500); padding: 2rem;">
+                  Loading transaction history...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Clean Payment Result Modal -->
+  <div id="receiptModal" class="modal-overlay">
+    <div class="receipt-card" style="max-width: 420px;">
+      <div class="receipt-icon">✓</div>
+      <h3 class="receipt-title">Payment Successful</h3>
+      <div id="receiptAmount" class="receipt-amount">₹1,000</div>
+
+      <div class="receipt-row">
+        <span class="receipt-label">Transaction ID</span>
+        <span id="receiptTxnCode" class="receipt-value font-mono">TXN-10001</span>
+      </div>
+
+      <div class="receipt-row">
+        <span class="receipt-label">Order ID</span>
+        <span id="receiptOrderId" class="receipt-value">ORD-DEMO-001</span>
+      </div>
+
+      <div class="receipt-row">
+        <span class="receipt-label">Payment Method</span>
+        <span id="receiptMethod" class="receipt-value">UPI</span>
+      </div>
+
+      <div class="receipt-row">
+        <span class="receipt-label">Gateway</span>
+        <span id="receiptGateway" class="receipt-value font-bold text-primary">Razorpay</span>
+      </div>
+
+      <div class="receipt-row" style="border-bottom: none;">
+        <span class="receipt-label">Status</span>
+        <span id="receiptStatus" class="receipt-value" style="color: var(--success);">SUCCESS</span>
+      </div>
+
+      <div style="margin-top: 1.5rem;">
+        <button onclick="closeReceiptModal()" class="btn btn-primary" style="width: 100%;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>UNIPAY &copy; 2026. Unified Payment Middleware Platform.</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/user.js"></script>
+</body>
+</html>
