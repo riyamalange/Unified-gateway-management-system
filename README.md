@@ -198,6 +198,9 @@ npm start
 - `PORT`: `10000` (Render sets this automatically)
 
 ### Common Render Deployment Errors & Solutions:
+- **`Rolldown failed to resolve import "react-is" from ".../recharts/..."`**:
+  - **Cause**: Recharts depends on `react-is`. When deploying on Render with Vite 8 / Rolldown bundling, npm tree pruning or peer resolution can leave `react-is` unhoisted unless explicitly declared.
+  - **Fix Applied**: Added `"react-is": "^19.3.0"` explicitly into `dependencies` in `package.json`.
 - **`npm error code ERESOLVE (esbuild / vite peer dependency conflict)`**:
   - **Cause**: Node/npm 7+ strictly checks peer dependencies. The pinned `esbuild@0.25.x` conflicted with `vite@8`'s optional peer requirement (`esbuild@^0.27.0 || ^0.28.0`).
   - **Fix Applied**: 
