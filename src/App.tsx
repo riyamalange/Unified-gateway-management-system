@@ -17,6 +17,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import { DailyVolumeChart } from './components/DailyVolumeChart';
 
 interface AuthUser {
   userId: number;
@@ -1222,6 +1223,15 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* Recharts Daily Transaction Volume Growth Chart */}
+                <DailyVolumeChart
+                  transactions={transactions}
+                  portalType="MERCHANT"
+                  entityName="FoodFast"
+                  title="Daily Transaction Volume & Growth (FoodFast)"
+                  subtitle="Track store sales volume and order growth trend over time"
+                />
+
                 {/* Recent Merchant Transactions */}
                 <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
                   <div className="p-4 border-b border-slate-200 flex items-center justify-between">
@@ -1605,6 +1615,15 @@ export default function App() {
                   </div>
                 </div>
               </div>
+
+              {/* Recharts System-Wide Daily Transaction Volume Growth Chart */}
+              <DailyVolumeChart
+                transactions={transactions}
+                portalType="ADMIN"
+                entityName="All Merchants"
+                title="System-Wide Daily Transaction Volume & Platform Growth"
+                subtitle="Track platform gross volume, settlement velocity, and transaction trends across all connected merchants"
+              />
 
               {/* System Transactions */}
               <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
