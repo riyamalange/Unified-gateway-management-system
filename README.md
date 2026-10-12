@@ -179,6 +179,32 @@ http://localhost:3000
 
 ---
 
+## ☁️ Deploying to Render
+
+You can deploy UNIPAY to [Render](https://render.com) as a **Web Service**:
+
+1. **Service Type**: **Web Service** (do NOT choose Static Site, as UNIPAY needs the backend API server).
+2. **Environment**: `Node`
+3. **Build Command**:
+   ```bash
+   npm install && npm run build
+   ```
+4. **Start Command**:
+   ```bash
+   npm start
+   ```
+5. **Environment Variables**:
+   - `NODE_ENV`: `production`
+   - `PORT`: `10000` (Render sets this automatically)
+
+### Common Render Deployment Errors & Solutions:
+- **`sh: 1: tsx: not found`**: Render skips devDependencies in production. We moved `tsx` to regular `dependencies` in `package.json`.
+- **`Port binding timeout`**: The server now binds explicitly to `0.0.0.0:${PORT}`.
+- **`Cannot find module 'dist/index.html'`**: Ensure your Build Command is `npm install && npm run build` so Vite compiles the frontend before the server starts.
+- **Spring Boot backend on Render**: The root `server.ts` is a self-contained full-stack mirror that runs without needing an external MySQL instance. If deploying the Java Spring Boot service in `/unipay-backend`, set Root Directory to `unipay-backend`, Build Command to `mvn clean package -DskipTests`, and provision a managed cloud MySQL database (e.g., Aiven or Railway).
+
+---
+
 ## 📄 License
 
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.

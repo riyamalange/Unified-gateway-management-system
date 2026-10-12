@@ -723,9 +723,10 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, () => {
+  const portNum = Number(PORT) || 3000;
+  app.listen(portNum, '0.0.0.0', () => {
     console.log(`=======================================================`);
-    console.log(` UNIPAY Full-Stack Server listening on port ${PORT}`);
+    console.log(` UNIPAY Full-Stack Server listening on 0.0.0.0:${portNum}`);
     console.log(` Spring Boot REST API mirror active on /api/*`);
     console.log(` Vanilla Frontend available on /unipay-frontend/index.html`);
     console.log(`=======================================================`);
