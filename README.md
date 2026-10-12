@@ -185,22 +185,28 @@ You can deploy UNIPAY to [Render](https://render.com) as a **Web Service**:
 
 1. **Service Type**: **Web Service** (do NOT choose Static Site, as UNIPAY needs the backend API server).
 2. **Environment**: `Node`
-3. **Build Command**:
-   ```bash
-   npm install && npm run build
-   ```
+### 3. Build Command:
+```bash
+npm install --legacy-peer-deps && npm run build
+```
 4. **Start Command**:
-   ```bash
-   npm start
-   ```
+```bash
+npm start
+```
 5. **Environment Variables**:
-   - `NODE_ENV`: `production`
-   - `PORT`: `10000` (Render sets this automatically)
+- `NODE_ENV`: `production`
+- `PORT`: `10000` (Render sets this automatically)
 
 ### Common Render Deployment Errors & Solutions:
-- **`sh: 1: tsx: not found`**: Render skips devDependencies in production. We moved `tsx` to regular `dependencies` in `package.json`.
-- **`Port binding timeout`**: The server now binds explicitly to `0.0.0.0:${PORT}`.
-- **`Cannot find module 'dist/index.html'`**: Ensure your Build Command is `npm install && npm run build` so Vite compiles the frontend before the server starts.
+- **`npm error code ERESOLVE (esbuild / vite peer dependency conflict)`**:
+  - **Cause**: Node/npm 7+ strictly checks peer dependencies. The pinned `esbuild@0.25.x` conflicted with `vite@8`'s optional peer requirement (`esbuild@^0.27.0 || ^0.28.0`).
+  - **Fix Applied**: 
+    1. Removed redundant `"esbuild"` pin from `package.json` devDependencies so `vite` and `tsx` manage their own compatible binaries.
+    2. Added `.npmrc` with `legacy-peer-deps=true`.
+    3. Changed the Render Build Command to `npm install --legacy-peer-deps && npm run build`.
+- **`sh: 1: tsx: not found`**: Render skips devDependencies in production. `tsx` is included in regular `dependencies` in `package.json`.
+- **`Port binding timeout`**: The server explicitly binds to `0.0.0.0:${PORT}` so Render's health check can reach it immediately.
+- **`Cannot find module 'dist/index.html'`**: Ensure your Build Command runs `npm run build` so Vite compiles the client assets into `/dist` before the server boots.
 - **Spring Boot backend on Render**: The root `server.ts` is a self-contained full-stack mirror that runs without needing an external MySQL instance. If deploying the Java Spring Boot service in `/unipay-backend`, set Root Directory to `unipay-backend`, Build Command to `mvn clean package -DskipTests`, and provision a managed cloud MySQL database (e.g., Aiven or Railway).
 
 ---
